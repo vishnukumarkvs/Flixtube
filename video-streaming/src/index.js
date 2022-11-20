@@ -1,36 +1,38 @@
 const express = require("express")
-const fs = require("fs")
-const path = require("path");
+const http=require("http")
 
 const app = express();
+
 if(!process.env.PORT){
     throw new Error("Please specify port using env variable PORT");
 }
-
 const PORT = process.env.PORT;
-// const PORT=3000;
+
+const VIDEO_STORAGE_HOST=process.env.VIDEO_STORAGE_HOST
+const VIDEO_STORAGE_PORT=process.env.VIDEO_STORAGE_PORT
+console.log(`Forwarding video requests to ${VIDEO_STORAGE_HOST}:${VIDEO_STORAGE_PORT}.`);
 
 app.get("/",(req,res)=>{
     res.send("Hello buddy")
 })
 
 app.get("/video",(req,res)=>{
-    const vpath=path.join("./videos","vid1.mp4");
-    //check status of file
-    fs.stat(vpath,(err,stats)=>{
-        if(err){
-            console.log("An error occured");
-            res.sendStatus(500);
-            return;
-        }
-        res.writeHead(200,{
-            "Content-Length":stats.size,
-            "Content-Type":"video/mp4",
-        });
-        fs.createReadStream(vpath).pipe(res)
-    });
+   const forwardRequest = http.request(
+    {
+        host: VIDEO_STORAGE_HOST,
+        port: VIDEO_STORAGE_PORT,
+        path: '/video?path=vid1.mp4',
+        method: 'GET',
+        headers: req.headers
+    },
+    forwardResponse =>{
+        res.writeHeader(forwardResponse.statusCode,forwardResponse.headers);
+        forwardResponse.pipe(res);
+    }
+   )
+   req.pipe(forwardRequest);
 });
 
 app.listen(PORT,()=>{
-    console.log(`First example app listening on port ${PORT}, point your browser at http://localhost:${PORT}`);
+    console.log(`Frontend online`);
 })

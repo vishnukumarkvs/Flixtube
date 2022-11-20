@@ -37,7 +37,7 @@ app.get("/video",(req,res)=>{
 })
 
 app.listen(PORT,()=>{
-    console.log(`Microservice Online`)
+    console.log(`Microservice azure storage online`)
 })
 
 
