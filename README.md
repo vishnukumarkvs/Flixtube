@@ -78,3 +78,9 @@ http://localhost:4000/video?path=vid1.mp4
 In production, we can restrict second microservice
 
 Use cloud storage rather than cluster storage. It makes cluster stateless
+
+
+Adding a database
+We add database to our application
+Database is used to store dynamic data
+Here, we are going to store metadata of our video that is stored in azure
