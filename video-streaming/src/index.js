@@ -1,36 +1,67 @@
 const express = require("express")
 const fs = require("fs")
 const path = require("path");
+const http=require("http")
 
-const app = express();
-if(!process.env.PORT){
-    throw new Error("Please specify port using env variable PORT");
+function sendViewedMessage(videoPath){
+    const postOptions = {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    }
+    const requestBody = {
+        videoPath: videoPath
+    }
+    const req=http.request(
+        "http://history/viewed",
+        postOptions
+    )
+    req.on("close",()=>{})
+    req.on("error",(err)=>{})
+    req.write(JSON.stringify(requestBody))
+    req.end()
 }
 
-const PORT = process.env.PORT;
-// const PORT=3000;
 
-app.get("/",(req,res)=>{
-    res.send("Hello buddy")
-})
+function setupHandlers(app){
+    app.get("/video",(req,res)=>{
+        const videoPath="./videos/vid1.mp4"
+        fs.stat(videoPath, (err,stats)=>{
+            if(err){
+                console.error("Error occured");
+                res.sendStatus(500);
+                return;
+            }
+            res.writeHead(200,{
+                "Content-Type": "video/mp4",
+                "Content-Length": stats.size
+            })
+            fs.createReadStream(videoPath).pipe(res);
+            
+        })
+        sendViewedMessage(videoPath)
+    })
+}
 
-app.get("/video",(req,res)=>{
-    const vpath=path.join("./videos","vid1.mp4");
-    //check status of file
-    fs.stat(vpath,(err,stats)=>{
-        if(err){
-            console.log("An error occured");
-            res.sendStatus(500);
-            return;
-        }
-        res.writeHead(200,{
-            "Content-Length":stats.size,
-            "Content-Type":"video/mp4",
-        });
-        fs.createReadStream(vpath).pipe(res)
-    });
-});
+function startHttpServer(){
+    return new Promise(resolve=>{
+        const app=express();
+        setupHandlers(app);
+        const port = process.env.PORT || 3000;
+        app.listen(port,()=>{
+            resolve();
+        })
+    })
+}
 
-app.listen(PORT,()=>{
-    console.log(`First example app listening on port ${PORT}, point your browser at http://localhost:${PORT}`);
-})
+function main(){
+    return startHttpServer();
+}
+
+main()
+  .then(()=>console.log('Microservice video-streaming online'))
+  .catch(err =>{
+    console.error("microservice failed to start");
+    console.error(err && err.stack || err);
+  })
