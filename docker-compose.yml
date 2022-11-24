@@ -1,13 +1,30 @@
 version: '3'
 services:
-  video-streaming:
-    image: video-streaming
+  history:
+    image: history
     build:
-      context: ./video-streaming
-      dockerfile: Dockerfile
-    container_name: video-streaming
+      context: ./history
+      dockerfile: Dockerfile-dev
+    container_name: history
+    volumes:
+      - /tmp/history/npm-cache:/root/.npm:z
+      - ./history/src:/usr/src/app/src:z
     ports:
-    - "4000:80"
+      - "4001:80"
     environment:
       - PORT=80
-    restart: "no"
+      - NODE_ENV=development
+    restart: always  
+
+    
+  # video-streaming:
+  #   image: video-streaming
+  #   build:
+  #     context: ./video-streaming
+  #     dockerfile: Dockerfile
+  #   container_name: video-streaming
+  #   ports:
+  #   - "4000:80"
+  #   environment:
+  #     - PORT=80
+  #   restart: "no"
