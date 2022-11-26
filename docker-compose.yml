@@ -23,6 +23,7 @@ services:
       - NODE_ENV=development
       - DBHOST=mongodb://db:27017
       - DBNAME=history
+      - RABBIT=amqp://guest:guest@rabbit:5672
     depends_on:
       - db
     restart: "no"  
@@ -42,6 +43,19 @@ services:
     environment:
       - PORT=80
       - NODE_ENV=development
+      - RABBIT=amqp://guest:guest@rabbit:5672
     restart: "no"
+
+  rabbit:
+    image: rabbitmq:3.8.1-management
+    container_name: rabbit
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    expose:
+      - "5672"
+      - "15672"
+    restart: always
+
 
 # localhost:4002/video

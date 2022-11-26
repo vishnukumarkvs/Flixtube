@@ -1,17 +1,28 @@
-Adding history service (For user history)
+#RabbitMq
+Single-Recipient message
+1 to 1 microservice
 
-nodemon --legacy-watch ./src/index.js. == Necessary 
+<br>
+
+EXPOSE vs -p
+
+- If you specify neither EXPOSE nor -p, the service in the container will only be accessible from inside the container itself.
+
+- If you EXPOSE a port, the service in the container is not accessible from outside Docker, but from inside other Docker containers. So this is good for inter-container communication.
+
+- If you EXPOSE and -p a port, the service in the container is accessible from anywhere, even outside Docker.
+
+- If you do -p, but do not EXPOSE, Docker does an implicit EXPOSE. This is because if a port is open to the public, it is automatically also open to other Docker containers. Hence -p includes EXPOSE. This is effectively same as 3).
 
 
-Enables caching for npm installs, making subsequent npm installs faster - npm cache
-During development, dont copy source code into docker image. Use Docker volumes in docker compose file
+# Management version rabbitmq gives dashboard
 
-https://docs.docker.com/storage/bind-mounts/
+5672 - used by amqlib to send and recieve messages
+15672 - dashboard - user,pass = guest(default) - used for debugging
 
-direct messaging - synchronous - http (post request)
-indirect messaging - async - rabbitmq
+History and video-streaming microservice depends on rabbitmq.rabbitmq is heavy microservice and takes time. so, rabbitmq needs to wait. we use wait-port for that (needs to check depends on)
+Also, all microservices needs to handle disconnection and connecting again with rabbitmq
 
-direct message - highly coupled - single microservice couple
 
-Once started, go to # localhost:4002/video. You can see video as well as recoed added meassage in console and also that record in mongodb using studio 3t
+rabbitmq needs wait-port. Mongodb automatically handles reconnections
 

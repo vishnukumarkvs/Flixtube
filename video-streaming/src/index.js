@@ -2,29 +2,24 @@ const express = require("express")
 const fs = require("fs")
 const path = require("path");
 const http=require("http")
+const amqp = require("amqplib");
+const RABBIT = process.env.RABBIT;
 
-function sendViewedMessage(videoPath){
-    const postOptions = {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        }
-    }
-    const requestBody = {
-        videoPath: videoPath
-    }
-    const req=http.request(
-        "http://history/viewed",
-        postOptions
-    )
-    req.on("close",()=>{})
-    req.on("error",(err)=>{})
-    req.write(JSON.stringify(requestBody))
-    req.end()
+function connectRabbit(){
+    return amqp.connect(RABBIT)
+      .then((messagingConnection)=>{
+        return messagingConnection.createChannel();
+      })
+}
+
+function sendViewedMessage(messageChannel,videoPath){
+    const msg={videoPath: videoPath}
+    const jsonMsg=JSON.stringify(msg)  // rabbitmq needs to manually serialize
+    messageChannel.publish("","viewed", Buffer.from(jsonMsg))
 }
 
 
-function setupHandlers(app){
+function setupHandlers(app, messageChannel){
     app.get("/video",(req,res)=>{
         const videoPath="./videos/vid1.mp4"
         fs.stat(videoPath, (err,stats)=>{
@@ -40,14 +35,14 @@ function setupHandlers(app){
             fs.createReadStream(videoPath).pipe(res);
             
         })
-        sendViewedMessage(videoPath)
+        sendViewedMessage(messageChannel, videoPath)
     })
 }
 
-function startHttpServer(){
+function startHttpServer(messageChannel){
     return new Promise(resolve=>{
         const app=express();
-        setupHandlers(app);
+        setupHandlers(app, messageChannel);
         const port = process.env.PORT || 3000;
         app.listen(port,()=>{
             resolve();
@@ -56,7 +51,10 @@ function startHttpServer(){
 }
 
 function main(){
-    return startHttpServer();
+    return connectRabbit()
+      .then(messageChannel =>{
+        return startHttpServer(messageChannel)
+      })
 }
 
 main()
