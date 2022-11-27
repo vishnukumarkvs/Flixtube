@@ -7,15 +7,22 @@ const RABBIT = process.env.RABBIT;
 
 function connectRabbit(){
     return amqp.connect(RABBIT)
-      .then((messagingConnection)=>{
-        return messagingConnection.createChannel();
+      .then((connection)=>{
+        console.log("Connected to RabbitMq");
+        return connection.createChannel()
+          .then(messageChannel =>{
+            return messageChannel.assertExchange("viewed","fanout")  //Asserts viewed exchange. Exchange_name=viewed, Exchange_type=fanout (broadcast)
+              .then(()=>{
+                return messageChannel;
+              })
+          })
       })
 }
 
 function sendViewedMessage(messageChannel,videoPath){
     const msg={videoPath: videoPath}
     const jsonMsg=JSON.stringify(msg)  // rabbitmq needs to manually serialize
-    messageChannel.publish("","viewed", Buffer.from(jsonMsg))
+    messageChannel.publish("viewed","", Buffer.from(jsonMsg)) //{p1: exchange name('' is derfault), p2: key, p3: payload}
 }
 
 

@@ -1,2 +1,4 @@
 video-streaming/node_modules
 history/node_modules
+recommendations/node_modules
+.env

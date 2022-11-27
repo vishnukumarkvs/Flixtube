@@ -25,9 +25,9 @@ function setupHandlers(app, db, messageChannel){
     const videoCollection = db.collection("videos")
     function consumeViewedMessage(msg){                                   //function to handle incoming messages
       const parsedMsg = JSON.parse(msg.content.toString());               //rabbitmq doesnt natively support JSON
-      console.log("(his)Received a 'viewed' message:");
-      console.log(JSON.stringify(parsedMsg, null, 4));
-      
+      console.log("(rec)Received a 'viewed' message:");
+      console.log(JSON.stringify(parsedMsg, null, 4)); 
+
       return videoCollection.insertOne({videoPath: parsedMsg.videoPath})
         .then(()=>{
           messageChannel.ack(msg);
@@ -39,8 +39,8 @@ function setupHandlers(app, db, messageChannel){
       })
       .then(response=>{
         const queueName = response.queue; //gives the queue a name which is an automatically generated unique identifier
-        console.log(`Consumed by history microservice, ${queueName}`)
-
+        console.log(`Consumed by recommendation microservice, ${queueName}`)
+        
         return messageChannel
           .bindQueue(queueName, "viewed", "")  //binds the anonymous queue with erxchange
             .then(()=>{
@@ -65,7 +65,6 @@ function startHttpServer(db,messageChannel){
 }
 
 function main(){
-    console.log("Hello World");
     return connectDB()
       .then(db => {
         return connectRabbit()

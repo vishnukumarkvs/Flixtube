@@ -17,7 +17,7 @@ services:
       - /tmp/history/npm-cache:/root/.npm:z
       - ./history/src:/usr/src/app/src:z
     ports:
-      - "4001:80"
+      - "4002:80"
     environment:
       - PORT=80
       - NODE_ENV=development
@@ -26,6 +26,29 @@ services:
       - RABBIT=amqp://guest:guest@rabbit:5672
     depends_on:
       - db
+      - rabbit
+    restart: "no"
+
+  recommendations:
+    image: recommendations
+    build:
+      context: ./recommendations
+      dockerfile: Dockerfile-dev
+    container_name: recommendations
+    volumes:
+      - /tmp/recommendations/npm-cache:/root/.npm:z
+      - ./recommendations/src:/usr/src/app/src:z
+    ports:
+      - "4003:80"
+    environment:
+      - PORT=80
+      - NODE_ENV=development
+      - DBHOST=mongodb://db:27017
+      - DBNAME=recommendations
+      - RABBIT=amqp://guest:guest@rabbit:5672
+    depends_on:
+      - db
+      - rabbit
     restart: "no"  
     
   video-streaming:
@@ -39,11 +62,13 @@ services:
       - ./video-streaming/src:/usr/src/app/src:z
       - ./video-streaming/videos:/usr/src/app/videos:z
     ports:
-    - "4002:80"
+    - "4001:80"
     environment:
       - PORT=80
       - NODE_ENV=development
       - RABBIT=amqp://guest:guest@rabbit:5672
+    depends_on:
+      - rabbit
     restart: "no"
 
   rabbit:
@@ -58,4 +83,4 @@ services:
     restart: always
 
 
-# localhost:4002/video
+# localhost:4001/video

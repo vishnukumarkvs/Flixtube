@@ -26,3 +26,19 @@ Also, all microservices needs to handle disconnection and connecting again with 
 
 rabbitmq needs wait-port. Mongodb automatically handles reconnections
 
+
+messageChannel.publish("viewed","", Buffer.from(jsonMsg)) check this in stage6 - exchange name, key, payload
+
+Sometimes direct messaging is useful, but generally speaking, indirect messaging allows for much more complex and resilient networks of behaviors. We might struggle to understand how it all fits together in its complexity, but at least we know that it’s reliable!
+
+Steps
+video-streaming
+- asserts exchange - fanout type, name=viewed
+- returns channel from exchange
+- publish message to channel
+
+history and recommendations
+- asserts exchange
+- creates a queue
+- bind it with exchange
+- consume the payload
