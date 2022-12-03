@@ -1,8 +1,16 @@
-resource "azurerm_kubernetes_cluster" "default" {
+resource "azurerm_kubernetes_cluster" "cluster" {
   name                = "${var.app_name}-aks"
   location            = var.location
   resource_group_name = azurerm_resource_group.r1.name
   dns_prefix          = "${var.app_name}-k8s"
+
+  linux_profile {
+        admin_username = var.admin_username
+
+        ssh_key {
+            key_data = "${trimspace(tls_private_key.key.public_key_openssh)} ${var.admin_username}@azure.com"
+        }
+    }
 
   default_node_pool {
     name            = "default"
@@ -21,4 +29,9 @@ resource "azurerm_kubernetes_cluster" "default" {
   tags = {
     environment = "Demo"
   }
+
+  provisioner "local-exec" {
+    command = "az aks get-credentials --resource-group ${var.rg_name}  --name ${azurerm_kubernetes_cluster.cluster.name} --overwrite-existing"
+  }
 }
+

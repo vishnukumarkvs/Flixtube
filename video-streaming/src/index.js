@@ -1,36 +1,53 @@
-const express = require("express")
-const fs = require("fs")
-const path = require("path");
+const express = require("express");
+const fs = require("fs");
 
-const app = express();
-if(!process.env.PORT){
-    throw new Error("Please specify port using env variable PORT");
+
+// Setup event handlers.
+function setupHandlers(app) {
+    app.get("/",(req,res)=>{
+        res.send("Hello Buddy")
+    })
+    app.get("/video", (req, res) => { // Route for streaming video.
+        
+        const videoPath = "./videos/vid1.mp4";
+        fs.stat(videoPath, (err, stats) => {
+            if (err) {
+                console.error("An error occurred ");
+                res.sendStatus(500);
+                return;
+            }
+    
+            res.writeHead(200, {
+                "Content-Length": stats.size,
+                "Content-Type": "video/mp4",
+            });
+    
+            fs.createReadStream(videoPath).pipe(res);
+        });
+    });
 }
 
-const PORT = process.env.PORT;
-// const PORT=3000;
-
-app.get("/",(req,res)=>{
-    res.send("Hello buddy")
-})
-
-app.get("/video",(req,res)=>{
-    const vpath=path.join("./videos","vid1.mp4");
-    //check status of file
-    fs.stat(vpath,(err,stats)=>{
-        if(err){
-            console.log("An error occured");
-            res.sendStatus(500);
-            return;
-        }
-        res.writeHead(200,{
-            "Content-Length":stats.size,
-            "Content-Type":"video/mp4",
+// Start the HTTP server.
+function startHttpServer() {
+    return new Promise((resolve, reject) => { // Wrap in a promise so we can be notified when the server has started.
+        const app = express();
+        setupHandlers(app);
+        
+        const port = process.env.PORT && parseInt(process.env.PORT) || 3000;
+        app.listen(port, () => {
+            resolve();
         });
-        fs.createReadStream(vpath).pipe(res)
     });
-});
+}
 
-app.listen(PORT,()=>{
-    console.log(`First example app listening on port ${PORT}, point your browser at http://localhost:${PORT}`);
-})
+// Application entry point.
+function main() {
+    return startHttpServer();
+}
+
+main()
+    .then(() => console.log("Microservice online."))
+    .catch(err => {
+        console.error("Microservice failed to start.");
+        console.error(err && err.stack || err);
+    });
