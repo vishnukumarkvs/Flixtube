@@ -17,3 +17,4 @@ https://learn.microsoft.com/en-us/azure/container-registry/container-registry-au
 Delete all images
 docker rmi $(docker images -q)
 
+![stage10img](https://user-images.githubusercontent.com/116954249/205444935-5a3042fb-2cec-4c57-a86e-9822726f9c76.jpg)
