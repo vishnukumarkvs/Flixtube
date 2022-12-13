@@ -1,80 +1,30 @@
-npm install --only=production 
-download packages required only for production. No dev dependencies
+# Using rabbitmq for decoupling
 
-nodemon
-for live reloading
-it restarts server on detection of code change
-npm install --save-dev nodemon
+- In previous stage, we used synchronous http request which resulted in tight coupling of microservices
+- Now, instead of that, we use rabbitmq which gives loose coupling
+- RabbitMQ is a messaging broker - an intermediary for messaging. It gives your applications a common platform to send and receive messages, and your messages a safe place to live until received.
+- Basic terminology of rabbitmq
+  - Queue: Buffer that stores messages. 
+  - Message: Information that is sent from the producer to a consumer through RabbitMQ. 
+  - Connection: A TCP connection between your application and the RabbitMQ broker. 
+  - Channel: A virtual connection inside a connection.
+- Here, we have two main microservices, video-streaming and history.
+- video-streaming microservices sends a message(which is videopath) into the queue. Then the history microservice consumes this message from the queue. Then it will insert a document into mongodb database
+- In video-streaming service, we create a connection to rabbitmq > create a channel > use publish() method to send message to queue
+- In history microservice, we will asset a queue > use consume() method to get message from queue > create a record in mongodb database
 
-npm start
-npm run start:dev
+### Additional info
+- Ports
+  - 5672 - used by amqlib to send and recieve messages
+  - 15672 - dashboard - user,pass = guest(default) - used for debugging
+- History and video-streaming microservice depends on rabbitmq.rabbitmq is heavy microservice and takes time. so, rabbitmq needs to wait. we use wait-port for that (needs to check depends on)
+- Also, all microservices needs to handle disconnection and connecting again with rabbitmq
+- rabbitmq needs wait-port. Mongodb automatically handles reconnections
 
-RUN - to run something during build process
-CMD - this command is invoked when a container is initiated
-
-
-docker build -t video-streaming --file Dockerfile .  {-t tagging, . in current dir}
-
-To check our image
-docker run -d -p 3001:3000 video-streaming
--d detached mode, run in background
--p port binding, port forwarding
-
-docker ps or docker container ls (To check running containers)
-docker logs <container_id>
-
-Try other
-docker run -p 27017:27107 mongo:latest
-
-To push to registry
-docker login <reg-url> --username <...> --password <...>
-docker login kvsreg.azurecr.io --username kvsreg --password <...>
-
-before push, tag the image
-docker tag video-streaming kvsreg.azurecr.io/video-streaming:1.0.0
-docker push kvsreg.azurecr.io/video-streaming:1.0.0
-
-docker exec -it lucid_mclaren /bin/sh
-exit
---------------------------------------------------------
-
-use mongodb for database and azure storage for storing assets
-Docker Compose allows us to configure, build, run, and manage multiple containers at the same time.
-
-put each microservice in its own directory
-
-create docker-compose file
-
-we keep restart=no so that we dont miss if microservice fail. We do opposite in production
-
-docker-compose up --build (if no build, it just starts container from previously built one. If changes made, they wont effect. So always use --build for best practice)
-
-docker-compose ps, docker ps
-docker-compose stop, ctrl+c (container is still present)
-docker-compose down (preffered)
-
-reboot
-docker-compose down && docker-compose up --build
-
-Azure Storage
-Create a storage account
-create a container video with private access
-upload video into the container
-
-Creating new microservice
-create folder azure-storage
-npm init
-npm install --save azure-storage
-
-Use blobservice to get and stream data
-
-Video-streaming-1
-Forward requests to video-storage
-Check index.js file for extra info
-build docker compose
-http://localhost:4001/video
-http://localhost:4000/video?path=vid1.mp4
-
-In production, we can restrict second microservice
-
-Use cloud storage rather than cluster storage. It makes cluster stateless
+---
+Docker info
+- **EXPOSE**  vs  **-p**
+- If you specify neither EXPOSE nor -p, the service in the container will only be accessible from inside the container itself.
+- If you EXPOSE a port, the service in the container is not accessible from outside Docker, but from inside other Docker containers. So this is good for inter-container communication.
+- If you EXPOSE and -p a port, the service in the container is accessible from anywhere, even outside Docker.
+- If you do -p, but do not EXPOSE, Docker does an implicit EXPOSE. This is because if a port is open to the public, it is automatically also open to other Docker containers. Hence -p includes EXPOSE. This is effectively same as 3).
