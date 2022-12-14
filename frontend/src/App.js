@@ -1,5 +1,3 @@
-import { AspectRatio } from '@chakra-ui/react'
-
 function App() {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-zinc-100">
