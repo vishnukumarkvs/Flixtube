@@ -1,13 +1,16 @@
 version: '3'
 services:
-  video-streaming:
-    image: video-streaming
+  jenkins:
+    image: jenkins-terraform-docker
     build:
-      context: ./video-streaming
       dockerfile: Dockerfile
-    container_name: video-streaming
     ports:
-    - "4000:80"
-    environment:
-      - PORT=80
-    restart: "no"
+    - "8080:8080"
+    - "50000:50000"
+    container_name: jenkins-terraform-docker
+    volumes:
+    - jenkins_home:/var/jenkins_home
+    - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  jenkins_home:

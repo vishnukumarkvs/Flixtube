@@ -1,4 +1,4 @@
-video-streaming/node_modules
+**/node_modules
 
 **/.terraform/*
 
