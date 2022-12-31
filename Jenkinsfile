@@ -6,8 +6,8 @@ pipeline {
   stages {
     stage('Checkout code from GitHub') {
       steps {
-        git url: 'https://github.com/Vishnukvsvk/azure-terraform-example.git',
-        branch: 'main'
+        git url: 'https://github.com/vishnukumarkvs/Flixtube.git',
+        branch: 'stage11'
       }
     }
     stage('Apply Terraform') {
