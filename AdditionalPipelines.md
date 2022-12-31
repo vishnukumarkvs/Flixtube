@@ -1,8 +1,8 @@
 terraform installation
-command shell - freestule
+command shell - freestyle
 terraform --version
 
-listRgs
+## listRgs
 Add azure service principal and verify
 az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/26c54b2f-dbef-4a0a-8ef7-ee63c958ca31"
 pipeline {
@@ -24,7 +24,7 @@ pipeline {
     }
 }
 
-Run terrafrom
+## Run terrafrom
 pipeline {
   agent any
   parameters {
