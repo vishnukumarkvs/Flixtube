@@ -14,6 +14,11 @@ terraform {
 
 provider "azurerm" {
   features {}
+
+  subscription_id = "26c54b2f-dbef-4a0a-8ef7-ee63c958ca31"
+  client_id       = var.client_id
+  client_secret   = var.client_secret
+  tenant_id       = var.tenant_id
 }
 
 // kubernetes cluster authentication

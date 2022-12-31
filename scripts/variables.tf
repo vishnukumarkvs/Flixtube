@@ -27,3 +27,7 @@ variable "admin_username" {
 variable "app_version" {
   default="1.0.0"
 }
+
+variable "client_id"{}
+variable "client_secret"{}
+variable "tenant_id"{}
