@@ -1,2 +1,8 @@
 .env
 video-streaming/node_modules
+
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
