@@ -19,3 +19,9 @@ RUN apt-get update && \
     apt-get update && \
     apt-get install -y azure-cli
 
+# Install Docker
+RUN apt-get update && \
+    apt-get install -y docker.io
+
+# Add the Jenkins user to the Docker group
+RUN usermod -aG docker jenkins
