@@ -22,3 +22,5 @@
 - Now we create a **Jenkinsfile** where we write a pipeline script to run terraform scripts
 - In jenkins, we create a pipeline job and use option pipeline from scm and give github repo details.
 - Atlast, we build the pipeline which runs the terraform script.
+
+## Bug - password not working in kubernetes deployment
