@@ -5,6 +5,14 @@
 - It has many branches starting from stage1.
 - As we move on from stages, we build microservices from scratch to containerizing the application to deploying it in Azure using Terraform
 
+## Tech Stack
+- Nodejs
+- RabbitMq
+- Azure Kubernetes Service
+- Azure Blob Storage
+- Terraform
+- Jenkins for CI/CD
+
 ### Here are all the stages from stage1
 1. Simple nodejs video-streaming microservice
 2. Microservice which streams a video file from Azure blob storage
