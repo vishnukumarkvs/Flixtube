@@ -13,7 +13,7 @@
 - Terraform
 - Jenkins for CI/CD
 
-### Here are all the stages from stage1
+## Here are all the stages from stage1
 1. Simple nodejs video-streaming microservice
 2. Microservice which streams a video file from Azure blob storage
 3. Creating two microservices and connecting them
