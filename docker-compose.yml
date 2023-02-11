@@ -31,3 +31,9 @@ services:
 # docker-compose up --build
 # docker-compose down
 # localhost:4001/video
+
+# docker-compose up --build -e STORAGE_ACCOUNT_NAME=<account-name> -e STORAGE_ACCESS_KEY=<access-key>
+# export STORAGE_ACCOUNT_NAME=<account-name>
+# export STORAGE_ACCESS_KEY=<access-key>
+# docker-compose up --build
+
